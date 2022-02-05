@@ -82,16 +82,12 @@ def get_host_addresses(use_ipv4: bool, use_ipv6: bool) -> List[str]:
     try:
         # doesn't even have to be reachable
         s.connect(('10.255.255.255', 1))
-        IPs = s.getsockname()
-        for IP in IPs:
-            if IP != '127.0.0.1':
-                addresses.append(IP)
+        IP = s.getsockname()[0]
     except Exception:
         IP = '127.0.0.1'
-        print("GOT Localhost")
-        # finally:
-        #     s.close()
-        addresses.append(IP)
+    # finally:
+    #     s.close()
+    addresses.append(IP)
     return addresses
 
 
