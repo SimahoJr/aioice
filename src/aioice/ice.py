@@ -10,7 +10,8 @@ import threading
 from itertools import count
 from typing import Dict, List, Optional, Set, Text, Tuple, Union, cast
 
-import netifaces
+# import netifaces
+import socket
 
 from . import mdns, stun, turn
 from .candidate import Candidate, candidate_foundation, candidate_priority
@@ -67,14 +68,26 @@ def get_host_addresses(use_ipv4: bool, use_ipv6: bool) -> List[str]:
     Get local IP addresses.
     """
     addresses = []
-    for interface in netifaces.interfaces():
-        ifaddresses = netifaces.ifaddresses(interface)
-        for address in ifaddresses.get(socket.AF_INET, []):
-            if use_ipv4 and address["addr"] != "127.0.0.1":
-                addresses.append(address["addr"])
-        for address in ifaddresses.get(socket.AF_INET6, []):
-            if use_ipv6 and address["addr"] != "::1" and "%" not in address["addr"]:
-                addresses.append(address["addr"])
+    # for interface in netifaces.interfaces():
+    #     ifaddresses = netifaces.ifaddresses(interface)
+    #     for address in ifaddresses.get(socket.AF_INET, []):
+    #         if use_ipv4 and address["addr"] != "127.0.0.1":
+    #             addresses.append(address["addr"])
+    #     for address in ifaddresses.get(socket.AF_INET6, []):
+    #         if use_ipv6 and address["addr"] != "::1" and "%" not in address["addr"]:
+    #             addresses.append(address["addr"])
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.settimeout(0)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    # finally:
+    #     s.close()
+    address.append(IP)
     return addresses
 
 
